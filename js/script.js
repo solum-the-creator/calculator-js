@@ -17,8 +17,14 @@ function multiply(a,b) {
 }
 
 function divide(a,b) {
-    return a/b;
+    let res = a/b;
+    if(!Number.isInteger(res) && res.toString().length>9) {
+        if(res.toString()[8] === '.') return res.slice(0,7);        
+        return res.toString().slice(0,8);
+    } 
+    return res;
 }
+
 
 function mod(a,b) {
     return a%b;
@@ -75,6 +81,7 @@ const displayEnter = document.querySelector('.display>.top-input');
 const numbersList = document.querySelectorAll('.calc-numbers');
 const operatorsList = document.querySelectorAll('.calc-operator');
 const equalOperator = document.querySelector('.calc-equal');
+const clearOperator = document.querySelector('.calc-clear');
 
 numbersList.forEach(number => {
     number.addEventListener('click',showValue);
@@ -85,6 +92,7 @@ operatorsList.forEach(operator => {
 });
 
 equalOperator.addEventListener('click',showFullResult);
+clearOperator.addEventListener('click',clearDisplay);
 
 
 //event handlers
@@ -116,6 +124,7 @@ function enterOperator(e) {
 
 }
 
+
 function showFullResult(e) {
     if(displayValueAfter) {
         curResult = operate(curOperator,displayValue,displayValueAfter);
@@ -130,8 +139,16 @@ function showFullResult(e) {
 }
 
 function clearDisplay(e) {
-    
+    displayValue = "0";
+    curResult = '';
+    curOperator = '';
+    displayValueAfter = '';
+    fromStart = false;
+    displayEnter.textContent = displayValue;
 }
+
+
+
 
 
 //functions enter values
@@ -140,9 +157,10 @@ function enterBefore(curObj) {
         fromStart = false;
         displayValue = '';
     }
-    if(displayValue === "0"){
+    if(displayValue == "0"){
         displayValue = "";
     }
+    if(displayValue.length === 9) return;
     if(curObj.dataset.value === '.' && displayValue.length === 0) displayValue+='0';
     if(curObj.dataset.value === '.' && displayValue.includes('.')) return;
 
@@ -154,6 +172,7 @@ function enterAfter(curObj) {
     if(displayValueAfter === "0"){
         displayValueAfter = "";
     }
+    if(displayValueAfter.length === 9) return;
     if(curObj.dataset.value === '.' && displayValueAfter.length === 0) displayValueAfter+='0';
     if(curObj.dataset.value === '.' && displayValueAfter.includes('.')) return;
 
@@ -163,6 +182,12 @@ function enterAfter(curObj) {
 
 
 function showResult() {
+    if(curResult === NaN || curResult=== Infinity || curResult=== -Infinity || curResult.toString().length > 9) {
+        displayEnter.textContent = 'Error';
+        fromStart = true;
+        displayValueAfter = '';
+        return;
+    }
     displayValueAfter = '';
     displayEnter.textContent = curResult;
 }
